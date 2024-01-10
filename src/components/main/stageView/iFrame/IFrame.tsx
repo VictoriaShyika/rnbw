@@ -15,6 +15,7 @@ import { useAppState } from "@_redux/useAppState";
 import { jss, styles } from "./constants";
 import { markSelectedElements } from "./helpers";
 import { useCmdk, useMouseEvents, useSyncNode } from "./hooks";
+import { useZoom } from "./hooks/useZoom";
 
 export const IFrame = () => {
   const dispatch = useDispatch();
@@ -28,9 +29,8 @@ export const IFrame = () => {
   const isEditingRef = useRef(false);
   const linkTagUidRef = useRef<TNodeUid>("");
 
-  const [zoomLevel, setZoomLevel] = useState(1);
   // hooks
-  const { nodeTreeRef, hoveredItemRef, focusedItemRef, selectedItemsRef } =
+  const { nodeTreeRef, focusedItemRef, selectedItemsRef } =
     useSyncNode(iframeRefState);
   const { onKeyDown } = useCmdk({
     iframeRefRef,
@@ -119,48 +119,7 @@ export const IFrame = () => {
   }, [needToReloadIframe]);
 
   // zoom iframe
-  useEffect(() => {
-    console.log("zoom level changed");
-
-    const setZoom = (level: any) => {
-      setZoomLevel(level);
-      console.log(iframeRefState, "### iframeRefState");
-      console.log(level, "level###");
-
-      iframeRefState && (iframeRefState.style.transform = `scale(${level})`);
-    };
-
-    const handleZoom = (key: any) => {
-      if (key >= "1" && key <= "9") {
-        setZoom(Number(`0.${key}`));
-      } else {
-        switch (key) {
-          case "0":
-          case "Escape":
-            setZoom(1);
-            break;
-          case "+":
-            setZoom(zoomLevel + 0.25);
-            break;
-          case "-":
-            setZoom(zoomLevel - 0.25);
-            break;
-          default:
-            break;
-        }
-      }
-    };
-
-    const handleKeyDown = (event: any) => {
-      handleZoom(event.key);
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [zoomLevel]);
+  useZoom(iframeRefState);
 
   return useMemo(() => {
     return (
@@ -175,6 +134,7 @@ export const IFrame = () => {
               position: "absolute",
               width: "100%",
               height: "100vh",
+              transition: "transform 0.3s ease",
             }}
           />
         )}
