@@ -310,7 +310,6 @@ export const useNodeTreeEvent = () => {
           _validNodeTree,
           needToExpandNodePaths,
         );
-        console.log(needToExpandNodeUids, "needToExpandNodeUids");
         dispatch(
           expandNodeTreeNodes([...needToExpandNodeUids, ...nFocusedItem]),
         );
