@@ -11,6 +11,7 @@ const nodeTreeReducerInitialState: TNodeTreeReducerState = {
 
   needToSelectNodePaths: null,
   needToSelectCode: null,
+  needToExpandNodePaths: null,
 
   nodeTreeViewState: {
     focusedItem: "",
@@ -42,7 +43,10 @@ const nodeTreeSlice = createSlice({
       const needToSelectCode = action.payload;
       state.needToSelectCode = needToSelectCode;
     },
-
+    setNeedToExpandNodePaths(state, action: PayloadAction<string[] | null>) {
+      const needToExpandNodePaths = action.payload;
+      state.needToExpandNodePaths = needToExpandNodePaths;
+    },
     focusNodeTreeNode(state, action: PayloadAction<TNodeUid>) {
       const focusedItem = action.payload;
       state.nodeTreeViewState.focusedItem = focusedItem;
@@ -153,6 +157,7 @@ export const {
 
   setNeedToSelectNodePaths,
   setNeedToSelectCode,
+  setNeedToExpandNodePaths,
 
   focusNodeTreeNode,
   setExpandedNodeTreeNodes,

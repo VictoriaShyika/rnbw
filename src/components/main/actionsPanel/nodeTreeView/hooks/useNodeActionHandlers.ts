@@ -191,11 +191,13 @@ export const useNodeActionHandlers = () => {
       targetUid,
       isBetween = false,
       position = 0,
+      expandedItems,
     }: {
       selectedUids: TNodeUid[];
       targetUid: TNodeUid;
       isBetween: boolean;
       position: number;
+      expandedItems: TNodeUid[];
     }) => {
       const codeViewInstance = monacoEditorRef.current;
       const codeViewInstanceModel = codeViewInstance?.getModel();
@@ -217,6 +219,7 @@ export const useNodeActionHandlers = () => {
         position,
         codeViewInstanceModel,
         formatCode,
+        expandedItems,
         fb: () => setIsContentProgrammaticallyChanged(false),
       });
     },

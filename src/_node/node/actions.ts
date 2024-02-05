@@ -12,7 +12,10 @@ import {
   RenameNodeActionPrefix,
 } from "@_constants/main";
 import { getValidNodeTree } from "@_pages/main/processor/helpers";
-import { setNeedToSelectNodePaths } from "@_redux/main/nodeTree";
+import {
+  setNeedToExpandNodePaths,
+  setNeedToSelectNodePaths,
+} from "@_redux/main/nodeTree";
 import { THtmlReferenceData } from "@_types/main";
 
 import {
@@ -418,6 +421,7 @@ const move = ({
   position,
   codeViewInstanceModel,
   formatCode,
+  expandedItems,
   fb,
   cb,
 }: {
@@ -429,6 +433,7 @@ const move = ({
   position: number;
   codeViewInstanceModel: editor.ITextModel;
   formatCode: boolean;
+  expandedItems: TNodeUid[];
   fb?: () => void;
   cb?: () => void;
 }) => {
@@ -478,6 +483,43 @@ const move = ({
         });
       }
     });
+    const needToExpandNodePaths = (() => {
+      const newExpandedNodePath: string[] = [];
+
+      expandedItems.map((expandedUid: string) => {
+        const validNodeTree = getValidNodeTree(nodeTree);
+        const expandedNode = validNodeTree[expandedUid];
+        if (expandedNode.parentUid === targetUid) {
+          const expandedNodeParent = validNodeTree[expandedNode.parentUid];
+          const childIndex = expandedNodeParent.children.indexOf(expandedUid);
+          const newNodeChildIndex =
+            position <= childIndex ? childIndex + 1 : childIndex;
+          const newNodePath = `${expandedNodeParent.data.path}${NodePathSplitter}${expandedNode.data.tagName}-${newNodeChildIndex}`;
+          newExpandedNodePath.push(newNodePath);
+        }
+
+        sortedUids.map((droppedUid) => {
+          // if (validNodeTree[droppedUid].parentUid === expandedNode.parentUid) {
+          //   const expandedNodeParent = validNodeTree[expandedNode.parentUid!];
+          //   const expandedChildIndex =
+          //     expandedNodeParent.children.indexOf(expandedUid);
+          //   const droppedChildIndex =
+          //     expandedNodeParent.children.indexOf(droppedUid);
+          //   const newNodeChildIndex =
+          //     droppedChildIndex < expandedChildIndex
+          //       ? expandedChildIndex - 1
+          //       : expandedChildIndex;
+          //   const newNodePath = `${expandedNodeParent.data.path}${NodePathSplitter}${expandedNode.data.tagName}-${newNodeChildIndex}`;
+          //   console.log(newNodePath, "2 newNodePath");
+          //   newExpandedNodePath.push(newNodePath);
+          // }
+        });
+      });
+      return newExpandedNodePath;
+    })();
+    dispatch(setNeedToExpandNodePaths(needToExpandNodePaths));
+
+    console.log(needToExpandNodePaths, "newExpandedItem");
 
     // predict needToSelectNodePaths
     const needToSelectNodePaths = (() => {

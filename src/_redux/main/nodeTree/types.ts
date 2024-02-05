@@ -9,6 +9,7 @@ export type TNodeTreeReducerState = {
 
   needToSelectNodePaths: string[] | null;
   needToSelectCode: TCodeSelection | null;
+  needToExpandNodePaths: string[] | null;
 
   nodeTreeViewState: TTreeViewState;
   hoveredNodeUid: TNodeUid;

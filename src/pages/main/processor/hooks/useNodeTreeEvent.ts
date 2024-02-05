@@ -28,6 +28,7 @@ import {
   focusNodeTreeNode,
   selectNodeTreeNodes,
   setExpandedNodeTreeNodes,
+  setNeedToExpandNodePaths,
   setNeedToSelectCode,
   setNeedToSelectNodePaths,
   setNeedToSelectNodeUids,
@@ -67,8 +68,9 @@ export const useNodeTreeEvent = () => {
     validNodeTree,
     needToSelectNodePaths,
     needToSelectCode,
+    needToExpandNodePaths,
     nExpandedItems,
-
+    nFocusedItem,
     syncConfigs,
     webComponentOpen,
     contentEditable,
@@ -302,6 +304,17 @@ export const useNodeTreeEvent = () => {
         // it is removed through dom-diff
         // this part is for when the selectedNodeUids is not changed cuz of the same code-format
         markSelectedElements(iframeRefRef.current, _selectedNodeUids);
+      }
+      if (needToExpandNodePaths) {
+        const needToExpandNodeUids = getNodeUidsFromPaths(
+          _validNodeTree,
+          needToExpandNodePaths,
+        );
+        console.log(needToExpandNodeUids, "needToExpandNodeUids");
+        dispatch(
+          setExpandedNodeTreeNodes([...needToExpandNodeUids, ...nFocusedItem]),
+        );
+        dispatch(setNeedToExpandNodePaths(null));
       }
     }
 
