@@ -483,43 +483,6 @@ const move = ({
         });
       }
     });
-    const needToExpandNodePaths = (() => {
-      const newExpandedNodePath: string[] = [];
-
-      expandedItems.map((expandedUid: string) => {
-        const validNodeTree = getValidNodeTree(nodeTree);
-        const expandedNode = validNodeTree[expandedUid];
-        if (expandedNode.parentUid === targetUid) {
-          const expandedNodeParent = validNodeTree[expandedNode.parentUid];
-          const childIndex = expandedNodeParent.children.indexOf(expandedUid);
-          const newNodeChildIndex =
-            position <= childIndex ? childIndex + 1 : childIndex;
-          const newNodePath = `${expandedNodeParent.data.path}${NodePathSplitter}${expandedNode.data.tagName}-${newNodeChildIndex}`;
-          newExpandedNodePath.push(newNodePath);
-        }
-
-        sortedUids.map((droppedUid) => {
-          // if (validNodeTree[droppedUid].parentUid === expandedNode.parentUid) {
-          //   const expandedNodeParent = validNodeTree[expandedNode.parentUid!];
-          //   const expandedChildIndex =
-          //     expandedNodeParent.children.indexOf(expandedUid);
-          //   const droppedChildIndex =
-          //     expandedNodeParent.children.indexOf(droppedUid);
-          //   const newNodeChildIndex =
-          //     droppedChildIndex < expandedChildIndex
-          //       ? expandedChildIndex - 1
-          //       : expandedChildIndex;
-          //   const newNodePath = `${expandedNodeParent.data.path}${NodePathSplitter}${expandedNode.data.tagName}-${newNodeChildIndex}`;
-          //   console.log(newNodePath, "2 newNodePath");
-          //   newExpandedNodePath.push(newNodePath);
-          // }
-        });
-      });
-      return newExpandedNodePath;
-    })();
-    dispatch(setNeedToExpandNodePaths(needToExpandNodePaths));
-
-    console.log(needToExpandNodePaths, "newExpandedItem");
 
     // predict needToSelectNodePaths
     const needToSelectNodePaths = (() => {
@@ -550,6 +513,42 @@ const move = ({
       return needToSelectNodePaths;
     })();
     dispatch(setNeedToSelectNodePaths(needToSelectNodePaths));
+
+    const needToExpandNodePaths = (() => {
+      const newExpandedNodePath: string[] = [];
+
+      expandedItems.map((expandedUid: string) => {
+        const validNodeTree = getValidNodeTree(nodeTree);
+        const expandedNode = validNodeTree[expandedUid];
+
+        if (expandedNode && expandedNode.parentUid === targetUid) {
+          const expandedNodeParent = validNodeTree[expandedNode.parentUid];
+          const childIndex = expandedNodeParent.children.indexOf(expandedUid);
+          const newNodeChildIndex =
+            position <= childIndex ? childIndex + 1 : childIndex;
+          const newNodePath = `${expandedNodeParent.data.path}${NodePathSplitter}${expandedNode.data.tagName}-${newNodeChildIndex}`;
+          newExpandedNodePath.push(newNodePath);
+        }
+
+        sortedUids.map((droppedUid) => {
+          if (validNodeTree[droppedUid].parentUid === expandedNode.parentUid) {
+            const expandedNodeParent = validNodeTree[expandedNode.parentUid!];
+            const expandedChildIndex =
+              expandedNodeParent.children.indexOf(expandedUid);
+            const droppedChildIndex =
+              expandedNodeParent.children.indexOf(droppedUid);
+            const newNodeChildIndex =
+              droppedChildIndex < expandedChildIndex
+                ? expandedChildIndex - 1
+                : expandedChildIndex;
+            const newNodePath = `${expandedNodeParent.data.path}${NodePathSplitter}${expandedNode.data.tagName}-${newNodeChildIndex}`;
+            newExpandedNodePath.push(newNodePath);
+          }
+        });
+      });
+      return newExpandedNodePath;
+    })();
+    dispatch(setNeedToExpandNodePaths(needToExpandNodePaths));
 
     code = formatCode
       ? html_beautify(codeViewInstanceModel.getValue())
